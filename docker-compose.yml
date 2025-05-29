@@ -1,0 +1,61 @@
+# version: '3.8'
+
+# services:
+#   frontend:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     ports:
+#       - "80:80"
+#     depends_on:
+#       - backend
+#     networks:
+#       - foyer-network
+
+#   backend:
+#     build:
+#       context: ../backend  # Adjust this path to your Spring Boot backend directory
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8080:8080"
+#     environment:
+#       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/foyer?createDatabaseIfNotExist=true
+#       - SPRING_DATASOURCE_USERNAME=root
+#       - SPRING_DATASOURCE_PASSWORD=root
+#       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+#     depends_on:
+#       - db
+#     networks:
+#       - foyer-network
+
+#   db:
+#     image: mysql:8.0
+#     ports:
+#       - "3306:3306"
+#     environment:
+#       - MYSQL_ROOT_PASSWORD=root
+#       - MYSQL_DATABASE=foyer
+#     volumes:
+#       - mysql-data:/var/lib/mysql
+#     networks:
+#       - foyer-network
+
+# networks:
+#   foyer-network:
+#     driver: bridge
+
+# volumes:
+#   mysql-data: 
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,141 @@
+<div class="container mt-4">
+  <!-- Error Alert -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <!-- Bloc Form -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">{{ isEditing ? 'Edit Bloc' : 'Add New Bloc' }}</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="blocForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="nomBloc" class="form-label">Bloc Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="nomBloc"
+              formControlName="nomBloc"
+              [class.is-invalid]="blocForm.get('nomBloc')?.invalid && blocForm.get('nomBloc')?.touched"
+            >
+            <div class="invalid-feedback" *ngIf="blocForm.get('nomBloc')?.errors?.['required']">
+              Bloc name is required
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="capaciteBloc" class="form-label">Capacity</label>
+            <input
+              type="number"
+              class="form-control"
+              id="capaciteBloc"
+              formControlName="capaciteBloc"
+              [class.is-invalid]="blocForm.get('capaciteBloc')?.invalid && blocForm.get('capaciteBloc')?.touched"
+            >
+            <div class="invalid-feedback" *ngIf="blocForm.get('capaciteBloc')?.errors?.['required']">
+              Capacity is required
+            </div>
+            <div class="invalid-feedback" *ngIf="blocForm.get('capaciteBloc')?.errors?.['min']">
+              Capacity must be greater than 0
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="idFoyer" class="form-label">Foyer ID</label>
+            <input
+              type="number"
+              class="form-control"
+              id="idFoyer"
+              formControlName="idFoyer"
+              [class.is-invalid]="blocForm.get('idFoyer')?.invalid && blocForm.get('idFoyer')?.touched"
+            >
+            <div class="invalid-feedback" *ngIf="blocForm.get('idFoyer')?.errors?.['required']">
+              Foyer ID is required
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="blocForm.invalid || isLoading"
+          >
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+            {{ isEditing ? 'Update' : 'Add' }} Bloc
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="resetForm()"
+            [disabled]="isLoading"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Blocs Table -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Blocs List</h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!isLoading && blocs.length === 0" class="alert alert-info">
+        No blocs found.
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading && blocs.length > 0">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Capacity</th>
+              <th>Foyer</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let bloc of blocs">
+              <td>{{ bloc.idBloc }}</td>
+              <td>{{ bloc.nomBloc }}</td>
+              <td>{{ bloc.capaciteBloc }}</td>
+              <td>{{ bloc.foyer.nomFoyer }}</td>
+              <td>
+                <div class="btn-group">
+                  <button
+                    class="btn btn-sm btn-outline-primary"
+                    (click)="editBloc(bloc)"
+                    [disabled]="isLoading"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="deleteBloc(bloc.idBloc)"
+                    [disabled]="isLoading"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

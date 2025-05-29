@@ -1,0 +1,145 @@
+<div class="container mt-4">
+  <!-- Error Alert -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <!-- Chambre Form -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">{{ isEditing ? 'Edit Chambre' : 'Add New Chambre' }}</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="chambreForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="numeroChambre" class="form-label">Room Number</label>
+            <input
+              type="number"
+              class="form-control"
+              id="numeroChambre"
+              formControlName="numeroChambre"
+              [class.is-invalid]="chambreForm.get('numeroChambre')?.invalid && chambreForm.get('numeroChambre')?.touched"
+            >
+            <div class="invalid-feedback" *ngIf="chambreForm.get('numeroChambre')?.errors?.['required']">
+              Room number is required
+            </div>
+            <div class="invalid-feedback" *ngIf="chambreForm.get('numeroChambre')?.errors?.['min']">
+              Room number must be greater than 0
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="typeC" class="form-label">Room Type</label>
+            <select
+              class="form-select"
+              id="typeC"
+              formControlName="typeC"
+              [class.is-invalid]="chambreForm.get('typeC')?.invalid && chambreForm.get('typeC')?.touched"
+            >
+              <option value="">Select Type</option>
+              <option *ngFor="let type of TypeChambre | keyvalue" [value]="type.value">
+                {{ type.value }}
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="chambreForm.get('typeC')?.errors?.['required']">
+              Room type is required
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="idBloc" class="form-label">Bloc ID</label>
+            <input
+              type="number"
+              class="form-control"
+              id="idBloc"
+              formControlName="idBloc"
+              [class.is-invalid]="chambreForm.get('idBloc')?.invalid && chambreForm.get('idBloc')?.touched"
+            >
+            <div class="invalid-feedback" *ngIf="chambreForm.get('idBloc')?.errors?.['required']">
+              Bloc ID is required
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="chambreForm.invalid || isLoading"
+          >
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+            {{ isEditing ? 'Update' : 'Add' }} Chambre
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="resetForm()"
+            [disabled]="isLoading"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Chambres Table -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Chambres List</h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!isLoading && chambres.length === 0" class="alert alert-info">
+        No chambres found.
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading && chambres.length > 0">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Room Number</th>
+              <th>Type</th>
+              <th>Bloc</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let chambre of chambres">
+              <td>{{ chambre.idChambre }}</td>
+              <td>{{ chambre.numeroChambre }}</td>
+              <td>{{ chambre.typeC }}</td>
+              <td>{{ chambre.bloc.nomBloc }}</td>
+              <td>
+                <div class="btn-group">
+                  <button
+                    class="btn btn-sm btn-outline-primary"
+                    (click)="editChambre(chambre)"
+                    [disabled]="isLoading"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="deleteChambre(chambre.idChambre)"
+                    [disabled]="isLoading"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

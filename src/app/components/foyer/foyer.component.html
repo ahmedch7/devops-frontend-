@@ -1,0 +1,153 @@
+<div class="container mt-4">
+  <!-- Error Alert -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <!-- Foyer Form -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">{{ isEditing ? 'Edit Foyer' : 'Add New Foyer' }}</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="foyerForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="nomFoyer" class="form-label">Foyer Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="nomFoyer"
+              formControlName="nomFoyer"
+              [class.is-invalid]="foyerForm.get('nomFoyer')?.invalid && foyerForm.get('nomFoyer')?.touched"
+            >
+            <div class="invalid-feedback" *ngIf="foyerForm.get('nomFoyer')?.errors?.['required']">
+              Foyer name is required
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="capaciteFoyer" class="form-label">Capacity</label>
+            <input
+              type="number"
+              class="form-control"
+              id="capaciteFoyer"
+              formControlName="capaciteFoyer"
+              [class.is-invalid]="foyerForm.get('capaciteFoyer')?.invalid && foyerForm.get('capaciteFoyer')?.touched"
+            >
+            <div class="invalid-feedback" *ngIf="foyerForm.get('capaciteFoyer')?.errors?.['required']">
+              Capacity is required
+            </div>
+            <div class="invalid-feedback" *ngIf="foyerForm.get('capaciteFoyer')?.errors?.['min']">
+              Capacity must be greater than 0
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="idUniversite" class="form-label">University ID</label>
+            <input
+              type="number"
+              class="form-control"
+              id="idUniversite"
+              formControlName="idUniversite"
+            >
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="foyerForm.invalid || isLoading"
+          >
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+            {{ isEditing ? 'Update' : 'Add' }} Foyer
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="resetForm()"
+            [disabled]="isLoading"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Foyers Table -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Foyers List</h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!isLoading && foyers.length === 0" class="alert alert-info">
+        No foyers found.
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading && foyers.length > 0">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Capacity</th>
+              <th>University</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let foyer of foyers">
+              <td>{{ foyer.idFoyer }}</td>
+              <td>{{ foyer.nomFoyer }}</td>
+              <td>{{ foyer.capaciteFoyer }}</td>
+              <td>{{ foyer.universite?.nomUniversite || 'Not assigned' }}</td>
+              <td>
+                <div class="btn-group">
+                  <button
+                    class="btn btn-sm btn-outline-primary"
+                    (click)="editFoyer(foyer)"
+                    [disabled]="isLoading"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="deleteFoyer(foyer.idFoyer)"
+                    [disabled]="isLoading"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    *ngIf="!foyer.universite"
+                    class="btn btn-sm btn-outline-success"
+                    (click)="affecterFoyerAUniversite(foyer.idFoyer, foyerForm.get('idUniversite')?.value)"
+                    [disabled]="isLoading || !foyerForm.get('idUniversite')?.value"
+                  >
+                    Assign to University
+                  </button>
+                  <button
+                    *ngIf="foyer.universite"
+                    class="btn btn-sm btn-outline-warning"
+                    (click)="desaffecterFoyerAUniversite(foyer.universite.idUniversite || 0)"
+                    [disabled]="isLoading"
+                  >
+                    Unassign
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,154 @@
+<div class="container mt-4">
+  <!-- Error Alert -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <!-- Universite Form -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">{{ isEditing ? 'Edit University' : 'Add New University' }}</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="universiteForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="nomUniversite" class="form-label">University Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="nomUniversite"
+              formControlName="nomUniversite"
+              [class.is-invalid]="universiteForm.get('nomUniversite')?.invalid && universiteForm.get('nomUniversite')?.touched"
+            >
+            <div class="invalid-feedback" *ngIf="universiteForm.get('nomUniversite')?.errors?.['required']">
+              University name is required
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="adresse" class="form-label">Address</label>
+            <input
+              type="text"
+              class="form-control"
+              id="adresse"
+              formControlName="adresse"
+              [class.is-invalid]="universiteForm.get('adresse')?.invalid && universiteForm.get('adresse')?.touched"
+            >
+            <div class="invalid-feedback" *ngIf="universiteForm.get('adresse')?.errors?.['required']">
+              Address is required
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="foyer" class="form-label">Foyer</label>
+            <select
+              class="form-select"
+              id="foyer"
+              formControlName="foyer"
+            >
+              <option [ngValue]="null">Select a foyer</option>
+              <option *ngFor="let foyer of foyers" [ngValue]="foyer.idFoyer">
+                {{ foyer.nomFoyer }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="universiteForm.invalid || isLoading"
+          >
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+            {{ isEditing ? 'Update' : 'Add' }} University
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="resetForm()"
+            [disabled]="isLoading"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Universities Table -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Universities List</h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="isLoading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!isLoading && universites.length === 0" class="alert alert-info">
+        No universities found.
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading && universites.length > 0">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Address</th>
+              <th>Foyer</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let universite of universites">
+              <td>{{ universite.idUniversite }}</td>
+              <td>{{ universite.nomUniversite }}</td>
+              <td>{{ universite.adresse }}</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <span>{{ universite.foyer.nomFoyer || 'Not assigned' }}</span>
+                  <select
+                    class="form-select form-select-sm"
+                    style="width: auto;"
+                    [value]="universite.foyer.idFoyer || ''"
+                    (change)="assignFoyer(universite, $any($event.target).value)"
+                    [disabled]="isLoading"
+                  >
+                    <option value="">Select foyer</option>
+                    <option *ngFor="let foyer of foyers" [value]="foyer.idFoyer">
+                      {{ foyer.nomFoyer }}
+                    </option>
+                  </select>
+                </div>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button
+                    class="btn btn-sm btn-outline-primary"
+                    (click)="editUniversite(universite)"
+                    [disabled]="isLoading"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="deleteUniversite(universite.idUniversite)"
+                    [disabled]="isLoading"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

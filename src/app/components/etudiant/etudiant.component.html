@@ -1,0 +1,127 @@
+<div class="container mt-4">
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <h2>{{ isEditing ? 'Edit' : 'Add' }} Étudiant</h2>
+    </div>
+    <div class="col-md-6">
+      <form [formGroup]="searchForm" (ngSubmit)="searchByNom()" class="d-flex">
+        <input type="text" class="form-control me-2" placeholder="Search by name..." formControlName="searchNom">
+        <button type="submit" class="btn btn-outline-primary me-2" [disabled]="isLoading">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+          Search
+        </button>
+        <button type="button" class="btn btn-outline-secondary" (click)="resetSearch()" [disabled]="isLoading">
+          Reset
+        </button>
+      </form>
+    </div>
+  </div>
+  
+  <form [formGroup]="etudiantForm" (ngSubmit)="onSubmit()" class="mb-4">
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="nomEt" class="form-label">Nom</label>
+        <input
+          type="text"
+          class="form-control"
+          id="nomEt"
+          formControlName="nomEt"
+          [class.is-invalid]="etudiantForm.get('nomEt')?.invalid && etudiantForm.get('nomEt')?.touched"
+        >
+        <div class="invalid-feedback" *ngIf="etudiantForm.get('nomEt')?.errors?.['required']">
+          Last name is required
+        </div>
+      </div>
+      
+      <div class="col-md-6 mb-3">
+        <label for="prenomEt" class="form-label">Prénom</label>
+        <input
+          type="text"
+          class="form-control"
+          id="prenomEt"
+          formControlName="prenomEt"
+          [class.is-invalid]="etudiantForm.get('prenomEt')?.invalid && etudiantForm.get('prenomEt')?.touched"
+        >
+        <div class="invalid-feedback" *ngIf="etudiantForm.get('prenomEt')?.errors?.['required']">
+          First name is required
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="cin" class="form-label">CIN</label>
+        <input type="text" class="form-control" id="cin" formControlName="cin">
+        <div class="text-danger" *ngIf="etudiantForm.get('cin')?.invalid && etudiantForm.get('cin')?.touched">
+          CIN is required
+        </div>
+      </div>
+      
+      <div class="col-md-6 mb-3">
+        <label for="ecole" class="form-label">École</label>
+        <input type="text" class="form-control" id="ecole" formControlName="ecole">
+        <div class="text-danger" *ngIf="etudiantForm.get('ecole')?.invalid && etudiantForm.get('ecole')?.touched">
+          École is required
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="dateNaissance" class="form-label">Date de Naissance</label>
+      <input type="date" class="form-control" id="dateNaissance" formControlName="dateNaissance">
+      <div class="text-danger" *ngIf="etudiantForm.get('dateNaissance')?.invalid && etudiantForm.get('dateNaissance')?.touched">
+        Date de naissance is required
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <button type="submit" class="btn btn-primary me-2" [disabled]="etudiantForm.invalid || isLoading">
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+        {{ isEditing ? 'Update' : 'Add' }}
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="resetForm()" [disabled]="isLoading">Cancel</button>
+    </div>
+  </form>
+
+  <h2>Liste des Étudiants</h2>
+  <div *ngIf="isLoading" class="text-center my-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  
+  <div *ngIf="!isLoading" class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nom</th>
+          <th>Prénom</th>
+          <th>CIN</th>
+          <th>École</th>
+          <th>Date de Naissance</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let etudiant of etudiants">
+          <td>{{ etudiant.idEtudiant }}</td>
+          <td>{{ etudiant.nomEt }}</td>
+          <td>{{ etudiant.prenomEt }}</td>
+          <td>{{ etudiant.cin }}</td>
+          <td>{{ etudiant.ecole }}</td>
+          <td>{{ etudiant.dateNaissance | date }}</td>
+          <td>
+            <button class="btn btn-sm btn-primary me-2" (click)="editEtudiant(etudiant)" [disabled]="isLoading">Edit</button>
+            <button class="btn btn-sm btn-danger" (click)="deleteEtudiant(etudiant.idEtudiant)" [disabled]="isLoading">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

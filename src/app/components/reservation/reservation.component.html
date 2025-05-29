@@ -1,0 +1,90 @@
+<div class="container mt-4">
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <h2>{{ isEditing ? 'Edit' : 'Add' }} Réservation</h2>
+  
+  <form [formGroup]="reservationForm" (ngSubmit)="onSubmit()" class="mb-4">
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="idReservation" class="form-label">Reservation ID</label>
+        <input type="text" class="form-control" id="idReservation" formControlName="idReservation" placeholder="Enter reservation ID">
+        <div class="text-danger" *ngIf="reservationForm.get('idReservation')?.invalid && reservationForm.get('idReservation')?.touched">
+          Reservation ID is required
+        </div>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="anneeUniversitaire" class="form-label">Année Universitaire</label>
+        <input type="text" class="form-control" id="anneeUniversitaire" formControlName="anneeUniversitaire" placeholder="2023-2024">
+        <div class="text-danger" *ngIf="reservationForm.get('anneeUniversitaire')?.invalid && reservationForm.get('anneeUniversitaire')?.touched">
+          Année universitaire is required
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="idEtudiant" class="form-label">ID Étudiant</label>
+        <input type="number" class="form-control" id="idEtudiant" formControlName="idEtudiant">
+        <div class="text-danger" *ngIf="reservationForm.get('idEtudiant')?.invalid && reservationForm.get('idEtudiant')?.touched">
+          ID Étudiant is required
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="estValide" formControlName="estValide">
+        <label class="form-check-label" for="estValide">Est Valide</label>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <button type="submit" class="btn btn-primary me-2" [disabled]="reservationForm.invalid || isLoading">
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+        {{ isEditing ? 'Update' : 'Add' }}
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="resetForm()" [disabled]="isLoading">Cancel</button>
+    </div>
+  </form>
+
+  <h2>Liste des Réservations</h2>
+  <div *ngIf="isLoading" class="text-center my-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  
+  <div *ngIf="!isLoading" class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Année Universitaire</th>
+          <th>Est Valide</th>
+          <th>ID Étudiant</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let reservation of reservations">
+          <td>{{ reservation.idReservation }}</td>
+          <td>{{ reservation.anneeUniversitaire }}</td>
+          <td>
+            <span class="badge" [ngClass]="reservation.estValide ? 'bg-success' : 'bg-danger'">
+              {{ reservation.estValide ? 'Valid' : 'Invalid' }}
+            </span>
+          </td>
+          <td>{{ reservation.idEtudiant }}</td>
+          <td>
+            <button class="btn btn-sm btn-primary me-2" (click)="editReservation(reservation)" [disabled]="isLoading">Edit</button>
+            <button class="btn btn-sm btn-danger" (click)="deleteReservation(reservation.idReservation)" [disabled]="isLoading">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
